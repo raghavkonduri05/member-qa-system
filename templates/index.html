@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Data Q&A System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .answer-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        
+        .answer-section.show {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .answer-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .answer-text {
+            color: #555;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            color: #667eea;
+            margin-top: 20px;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .examples {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .examples h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+        
+        .example-btn {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 8px 15px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .example-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .error {
+            background: #fee;
+            border-left-color: #f44;
+            color: #c33;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤔 Member Data Q&A System</h1>
+        <p class="subtitle">Ask questions about member data from the messages</p>
+        
+        <form id="qaForm">
+            <div class="input-group">
+                <label for="question">Your Question:</label>
+                <textarea 
+                    id="question" 
+                    name="question" 
+                    placeholder="e.g., When is Layla planning her trip to Santorini?"
+                    required
+                ></textarea>
+            </div>
+            
+            <button type="submit" id="submitBtn">Ask Question</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px;">Processing your question...</p>
+        </div>
+        
+        <div class="answer-section" id="answerSection">
+            <div class="answer-label">Answer:</div>
+            <div class="answer-text" id="answerText"></div>
+        </div>
+        
+        <div class="examples">
+            <h3>💡 Example Questions:</h3>
+            <button type="button" class="example-btn" onclick="setQuestion('When is Layla planning her trip to Santorini?')">
+                When is Layla planning her trip to Santorini?
+            </button>
+            <button type="button" class="example-btn" onclick="setQuestion('What restaurants has Fatima El-Tahir mentioned?')">
+                What restaurants has Fatima El-Tahir mentioned?
+            </button>
+            <button type="button" class="example-btn" onclick="setQuestion('Where is Vikram Desai traveling?')">
+                Where is Vikram Desai traveling?
+            </button>
+            <button type="button" class="example-btn" onclick="setQuestion('What are Layla\'s travel preferences?')">
+                What are Layla's travel preferences?
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('qaForm');
+        const questionInput = document.getElementById('question');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const answerSection = document.getElementById('answerSection');
+        const answerText = document.getElementById('answerText');
+        
+        function setQuestion(question) {
+            questionInput.value = question;
+            questionInput.focus();
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const question = questionInput.value.trim();
+            if (!question) return;
+            
+            // Show loading, hide answer
+            loading.classList.add('show');
+            answerSection.classList.remove('show');
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Show answer
+                answerText.textContent = data.answer || 'No answer received';
+                answerSection.classList.add('show');
+                
+                // Remove error class if it was there
+                answerSection.classList.remove('error');
+                
+            } catch (error) {
+                // Show error
+                answerText.textContent = `Error: ${error.message}. Make sure the server is running.`;
+                answerSection.classList.add('show', 'error');
+            } finally {
+                loading.classList.remove('show');
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
