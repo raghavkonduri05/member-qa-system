@@ -391,76 +391,7 @@ During the development of this question-answering system, I considered several a
 
 ---
 
-#### **Alternative 2: Fine-Tuned Custom Model**
-
-**Approach:**
-- Fine-tune a smaller language model (like Llama 2, Mistral, or GPT-3.5) on the specific message dataset
-- Train the model to understand the domain-specific context
-- Deploy the fine-tuned model for question answering
-
-**Pros:**
-- Better domain-specific understanding
-- Potentially lower inference costs (smaller models)
-- No need to send full context with each query
-- Can be optimized for specific question types
-
-**Cons:**
-- Requires training data preparation and labeling
-- Training time and computational resources needed
-- Model maintenance and versioning complexity
-- Less flexible for new types of questions
-- Higher initial development time
-
-**Why Not Chosen:**
-- No labeled training data available
-- Longer development cycle
-- Requires ML expertise and infrastructure
-- Current approach is more flexible and adaptable
-
-**When to Use:**
-- When you have labeled training data
-- For domain-specific terminology and patterns
-- When query patterns are predictable
-- For cost optimization at scale
-
----
-
-#### **Alternative 3: Rule-Based System with NLP**
-
-**Approach:**
-- Use NLP libraries (spaCy, NLTK) to extract entities and relationships
-- Create rule-based patterns for common question types
-- Build a knowledge graph from messages
-- Use pattern matching and templates for answers
-
-**Pros:**
-- No API costs (OpenAI)
-- Predictable and explainable results
-- Fast response times
-- Full control over answer generation
-
-**Cons:**
-- Requires extensive rule engineering
-- Brittle - breaks with new question types
-- Limited understanding of context and nuance
-- High maintenance overhead
-- Poor handling of ambiguous questions
-
-**Why Not Chosen:**
-- Natural language questions are too varied for rules
-- Would require extensive domain knowledge
-- Less flexible and adaptable
-- Modern LLMs provide better understanding
-
-**When to Use:**
-- For very specific, predictable question types
-- When cost is a primary concern
-- For domains with strict, well-defined schemas
-- When explainability is critical
-
----
-
-#### **Alternative 4: Hybrid Approach (Keyword Search + LLM)**
+#### **Alternative 2: Hybrid Approach (Keyword Search + LLM)**
 
 **Approach:**
 - Use keyword/search-based filtering to narrow down relevant messages
@@ -494,7 +425,7 @@ During the development of this question-answering system, I considered several a
 
 ---
 
-#### **Alternative 5: Multi-Agent System**
+#### **Alternative 3: Multi-Agent System**
 
 **Approach:**
 - Create specialized agents for different question types (travel, preferences, ownership, etc.)
@@ -554,3 +485,41 @@ If the system needs to scale, the natural evolution would be:
 
 ---
 
+### Bonus 2: Data Insights & Anomaly Report
+
+During the analysis of the member-message dataset, several data-quality issues and behavioral patterns were identified. These insights highlight areas where the question-answering system must interpret incomplete or inconsistent natural-language input.
+
+**1. Duplicate and Repetitive User Requests**
+Many users send multiple messages expressing the same intent, such as modifying travel plans or clarifying billing concerns.
+Impact: Can create conflicting interpretations if older messages are not deprioritized.
+
+**2. Inconsistent Phone Number Formatting**
+Phone numbers appear in mixed formats, from hyphenated patterns to digit-only strings.
+Impact: Makes extraction and validation more challenging without normalization.
+
+**3. Long-Term Preferences Mixed With One-Time Requests**
+Messages often combine persistent preferences (e.g., seat choice, dietary needs) with temporary, one-off actions (e.g., booking for a specific date).
+Impact: The system must distinguish long-term preferences from short-term requests.
+
+**4. Irregular or Non-Sequential Timestamps**
+Timestamps span across different years and are not always in logical order.
+Impact: Complicates determining the most recent user intent or preference.
+
+**5. Missing System Responses**
+Users frequently ask for confirmations (e.g., “Any update?”, “Has this been processed?”), yet system replies are not recorded in the dataset.
+Impact: Makes it unclear whether requests have been fulfilled or remain pending.
+
+**6. Address Formatting Issues**
+Addresses appear in partial or full street forms, but none include state or country information.
+Impact: Limits accurate geolocation, travel planning, and disambiguation across cities with identical names.
+
+**7. Ambiguous Short Messages**
+Some messages lack essential context (e.g., “Please book it for Friday”).
+Impact: Increases the need for inference and the risk of misinterpretation.
+
+**8. Mixed Sentiment Across Messages**
+Users may alternate between positive and negative tone across their messages.
+Impact: Affects sentiment analysis and automated prioritization.
+
+✔️ Summary
+The dataset provides valuable user insights but also presents challenges such as repeated intents, inconsistent formatting, missing geographic information, vague messages, and irregular timestamps. Addressing these issues with normalization and context-aware NLP techniques will improve the reliability and accuracy of the question-answering system.
